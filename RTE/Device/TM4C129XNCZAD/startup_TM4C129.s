@@ -40,7 +40,7 @@ __heap_limit
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Handler_Stack_Size      EQU     0x00000800
+Handler_Stack_Size  EQU 0x00000800
 Thread_Stack_Size	EQU	0x00000800	
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -206,8 +206,11 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  SystemInit
 				IMPORT  __main
-		
+
 				; Store __initial_sp into MSP (Step 1 toward Midpoint Report)
+				LDR R0,__initial_sp
+				MSR MSP, R0
+
 
 				ISB     ; Let's leave as is from the original.
 				LDR     R0, =SystemInit
@@ -218,7 +221,18 @@ Reset_Handler   PROC
 				; Initialize the SysTick timer (Step 2)
 			
 				; Store __initial_user_sp into PSP (Step 1 toward Midpoint Report)
+				LDR R0,__initial_user_sp
+				MSR PSP, R0
+				
 				; Change CPU mode into unprivileged thread mode using PSP
+				;[Hajira] Control register bit 0 = nPriv
+				;nPriv = 0(Privileged), npriv = 1(using msp)
+				;[Hajira] Control register bit 1 = SPSEL
+				;SPSEL = 0(using psp), SPSEL = 1(using msp)
+				MRS R0,CONTROL
+				ORR R0,R0,#0x3
+				MSR CONTROL, R0
+				ISB
 
                 LDR     R0, =__main
                 BX      R0
@@ -253,7 +267,7 @@ UsageFault_Handler\
 SVC_Handler     PROC 		; (Step 2)
 				EXPORT  SVC_Handler               [WEAK]
 		; Save registers 
-		; Invoke _syscall_table_ump
+		; Invoke _syscall_table_jump
 		; Retrieve registers
 		; Go back to stdlib.s
                 B       .
