@@ -35,8 +35,9 @@ _strncpy
 		EXPORT	_malloc
 _malloc
 		; save registers
+
 		; set the system call # to R7
-	        SVC     #0x0
+	        SVC     #0x4
 		; resume registers
 		MOV		pc, lr
 
@@ -50,7 +51,7 @@ _malloc
 _free
 		; save registers
 		; set the system call # to R7
-        	SVC     #0x0
+        	SVC     #0x5
 		; resume registers
 		MOV		pc, lr
 

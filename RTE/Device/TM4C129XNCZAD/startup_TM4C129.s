@@ -206,6 +206,8 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  SystemInit
 				IMPORT  __main
+				IMPORT  _syscall_table_init
+				IMPORT  _heap_init
 		
 				; Store __initial_sp into MSP (Step 1 toward Midpoint Report)
 
@@ -214,7 +216,9 @@ Reset_Handler   PROC
 				BLX     R0
 
 				; Initialize the system call table (Step 2)
+				BL _syscall_table_init
 				; Initialize the heap space (Step 2)
+				BL _heap_init
 				; Initialize the SysTick timer (Step 2)
 			
 				; Store __initial_user_sp into PSP (Step 1 toward Midpoint Report)
@@ -252,8 +256,11 @@ UsageFault_Handler\
                 ENDP
 SVC_Handler     PROC 		; (Step 2)
 				EXPORT  SVC_Handler               [WEAK]
-		; Save registers 
+				IMPORT  _syscall_table_jump
+		; Save registers
+				
 		; Invoke _syscall_table_ump
+				BL _syscall_table_jump
 		; Retrieve registers
 		; Go back to stdlib.s
                 B       .

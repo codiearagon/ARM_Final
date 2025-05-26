@@ -23,8 +23,13 @@ _syscall_table_init
 ; System Call Table Jump Routine
         EXPORT	_syscall_table_jump
 _syscall_table_jump
+		IMPORT _kfree
+		IMPORT _kalloc
 	;; Implement by yourself
-	
+		; check R7
+		CMP R7, #SYS_MALLOC
+		BEQ _kalloc
+		; invoke routine based on R7
 		MOV		pc, lr			
 		
 		END
