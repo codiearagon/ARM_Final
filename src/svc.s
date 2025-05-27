@@ -25,10 +25,12 @@ _syscall_table_init
 _syscall_table_jump
 		IMPORT _kfree
 		IMPORT _kalloc
-	;; Implement by yourself
+			
+		; not meant as final, only for heap testing
+		;; Implement by yourself
 		; check R7
 		CMP R7, #0x4
-		BEQ _kalloc
+		BEQ _kalloc ; is not branching for some reason
 		; invoke routine based on R7
 		MOV		pc, lr			
 		

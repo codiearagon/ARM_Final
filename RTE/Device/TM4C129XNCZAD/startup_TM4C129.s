@@ -40,7 +40,7 @@ __heap_limit
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Handler_Stack_Size      EQU     0x00000800
+Handler_Stack_Size  EQU 0x00000800
 Thread_Stack_Size	EQU	0x00000800	
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -206,23 +206,45 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  SystemInit
 				IMPORT  __main
-				IMPORT  _syscall_table_init
-				IMPORT  _heap_init
-		
+				IMPORT _syscall_table_init
+				IMPORT _heap_init
+				IMPORT _timer_init
+
 				; Store __initial_sp into MSP (Step 1 toward Midpoint Report)
+				; LDR R0,__initial_sp [commented this out for now since i can't compile]
+				; MSR MSP, R0
 
 				ISB     ; Let's leave as is from the original.
 				LDR     R0, =SystemInit
 				BLX     R0
 
-				; Initialize the system call table (Step 2)
-				BL _syscall_table_init
+				;[Hajira] BL saves to link register, MOV PC,LR takes program back here
+				LDR R0, =_syscall_table_init
+				BLX R0
+				
 				; Initialize the heap space (Step 2)
-				BL _heap_init
+				LDR R0, =_heap_init
+				BLX R0
+
 				; Initialize the SysTick timer (Step 2)
-			
+				LDR R0, =_timer_init
+				BLX R0
+
 				; Store __initial_user_sp into PSP (Step 1 toward Midpoint Report)
+				; LDR R0,__initial_user_sp [commented this out for now since i can't compile]
+				; MSR PSP, R0
+				
 				; Change CPU mode into unprivileged thread mode using PSP
+				;[Hajira] Control register bit 0 = nPriv
+				;nPriv = 0(Privileged), npriv = 1(using msp)
+				;[Hajira] Control register bit 1 = SPSEL
+				;SPSEL = 0(using psp), SPSEL = 1(using msp)
+				
+				; [commented this out for now since i can't compile]
+				; MRS R0,CONTROL
+				; ORR R0,R0,#0x3
+				; MSR CONTROL, R0
+				; ISB
 
                 LDR     R0, =__main
                 BX      R0
@@ -261,10 +283,12 @@ SVC_Handler     PROC 		; (Step 2)
 				STMDB SP!, {R0, R1, R7}
 		; Invoke _syscall_table_ump
 				BL _syscall_table_jump
+		; Save registers 
+		; Invoke _syscall_table_jump
 		; Retrieve registers
 				LDMIA SP!, {R0, R1, R7}
 		; Go back to stdlib.s
-                B		.
+                B		.  ; have to jump back to stdlib.s
                 ENDP
 DebugMon_Handler\
                 PROC
