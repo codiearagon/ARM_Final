@@ -27,7 +27,7 @@ _syscall_table_jump
 		IMPORT _kalloc
 	;; Implement by yourself
 		; check R7
-		CMP R7, #SYS_MALLOC
+		CMP R7, #0x4
 		BEQ _kalloc
 		; invoke routine based on R7
 		MOV		pc, lr			

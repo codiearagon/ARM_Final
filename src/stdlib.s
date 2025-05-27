@@ -35,10 +35,13 @@ _strncpy
 		EXPORT	_malloc
 _malloc
 		; save registers
-
+			STMDB SP!, {R0-R12}
 		; set the system call # to R7
+			MOV		R7, #0x4
+			MOV		R8, PC
 	        SVC     #0x4
 		; resume registers
+			LDMIA SP!, {R0-R12}
 		MOV		pc, lr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
