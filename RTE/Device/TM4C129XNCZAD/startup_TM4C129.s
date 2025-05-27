@@ -206,6 +206,10 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  SystemInit
 				IMPORT  __main
+				IMPORT _systemcall_table_init
+				IMPORT _kinit
+				IMPORT _timer_init
+
 
 				; Store __initial_sp into MSP (Step 1 toward Midpoint Report)
 				LDR R0,__initial_sp
@@ -217,8 +221,17 @@ Reset_Handler   PROC
 				BLX     R0
 
 				; Initialize the system call table (Step 2)
+				;[Hajira] BL saves to link register, MOV PC,LR takes program back here
+				LDR R0, _systemcall_table_init
+				BL R0
 				; Initialize the heap space (Step 2)
+				LDR R0, _kinit
+				BL R0
+
 				; Initialize the SysTick timer (Step 2)
+				LDR R0, _timer_init
+				BL R0
+
 			
 				; Store __initial_user_sp into PSP (Step 1 toward Midpoint Report)
 				LDR R0,__initial_user_sp
