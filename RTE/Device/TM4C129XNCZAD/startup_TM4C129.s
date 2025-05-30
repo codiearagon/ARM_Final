@@ -205,14 +205,14 @@ __Vectors_Size  EQU     __Vectors_End - __Vectors
 Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  SystemInit
-				IMPORT  __main
+				IMPORT __main
 				IMPORT _syscall_table_init
 				IMPORT _heap_init
 				IMPORT _timer_init
 
 				; Store __initial_sp into MSP (Step 1 toward Midpoint Report)
-				; LDR R0,__initial_sp [commented this out for now since i can't compile]
-				; MSR MSP, R0
+				LDR R0, =__initial_sp
+				MSR MSP, R0
 
 				ISB     ; Let's leave as is from the original.
 				LDR     R0, =SystemInit
@@ -231,8 +231,8 @@ Reset_Handler   PROC
 				BLX R0
 
 				; Store __initial_user_sp into PSP (Step 1 toward Midpoint Report)
-				; LDR R0,__initial_user_sp [commented this out for now since i can't compile]
-				; MSR PSP, R0
+				LDR R0, =__initial_user_sp 
+				MSR PSP, R0
 				
 				; Change CPU mode into unprivileged thread mode using PSP
 				;[Hajira] Control register bit 0 = nPriv
@@ -240,11 +240,10 @@ Reset_Handler   PROC
 				;[Hajira] Control register bit 1 = SPSEL
 				;SPSEL = 0(using psp), SPSEL = 1(using msp)
 				
-				; [commented this out for now since i can't compile]
-				; MRS R0,CONTROL
-				; ORR R0,R0,#0x3
-				; MSR CONTROL, R0
-				; ISB
+				MRS R0,CONTROL
+				ORR R0,R0,#0x3
+				MSR CONTROL, R0
+				ISB
 
                 LDR     R0, =__main
                 BX      R0

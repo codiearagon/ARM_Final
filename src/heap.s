@@ -25,14 +25,13 @@ _heap_init
 		LDR		R2, =MCB_ENT_SZ
 		LDR		R3, =MCB_TOTAL
 		MOV		R4, #0
-_loop
+_heap_init_loop
 				CMP R0, R1
-				BEQ _done
-				STR R4, [R0] ; map heap to mcb
-				ADD R0, R0, R2 ; add entry size to
-				ADD R5, R5, #1 ; counter
-				B _loop
-_done
+				BEQ _heap_init_done
+				STR R4, [R0] ; init mcb addr to 0
+				ADD R0, R0, R2 ; add entry size to current addr
+				B _heap_init_loop
+_heap_init_done
 		MOV		pc, lr
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
