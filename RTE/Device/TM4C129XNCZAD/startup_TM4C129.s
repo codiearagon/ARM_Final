@@ -279,15 +279,15 @@ SVC_Handler     PROC 		; (Step 2)
 				EXPORT  SVC_Handler               [WEAK]
 				IMPORT  _syscall_table_jump
 		; Save registers
-				STMDB SP!, {R0, R1, R7}
+				STMDB SP!, {LR, R0, R1, R7}
 		; Invoke _syscall_table_ump
 				BL _syscall_table_jump
 		; Save registers 
 		; Invoke _syscall_table_jump
 		; Retrieve registers
-				LDMIA SP!, {R0, R1, R7}
+				LDMIA SP!, {LR, R0, R1, R7}
 		; Go back to stdlib.s
-                B		.  ; have to jump back to stdlib.s
+                BX		LR  ; have to jump back to stdlib.s
                 ENDP
 DebugMon_Handler\
                 PROC

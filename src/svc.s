@@ -7,15 +7,29 @@ SYSTEMCALLTBL	EQU		0x20007B00 ; originally 0x20007500
 SYS_EXIT		EQU		0x0		; address 20007B00
 SYS_ALARM		EQU		0x1		; address 20007B04
 SYS_SIGNAL		EQU		0x2		; address 20007B08
-SYS_MEMCPY		EQU		0x3		; address 20007B0C
-SYS_MALLOC		EQU		0x4		; address 20007B10
-SYS_FREE		EQU		0x5		; address 20007B14
+SYS_MALLOC		EQU		0x3		; address 20007B0C
+SYS_FREE		EQU		0x4		; address 20007B10
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; System Call Table Initialization
 		EXPORT	_syscall_table_init
 _syscall_table_init
-	;; Implement by yourself
+		IMPORT _kfree
+		IMPORT _kalloc
+		IMPORT _signal_handler
+		IMPORT _timer_start
+			
+		LDR R0, =SYSTEMCALLTBL
+		LDR R1, =_timer_start
+		LDR R2, =_signal_handler
+		LDR R3, =_kalloc
+		LDR R4, =_kfree
+		
+		; map the syscalltbl addresses to the function addresses
+		STR R1, [R0, #4]
+		STR R2, [R0, #8]
+		STR R3, [R0, #12]
+		STR R4, [R0, #16]
 	
 		MOV		pc, lr
 
@@ -23,15 +37,18 @@ _syscall_table_init
 ; System Call Table Jump Routine
         EXPORT	_syscall_table_jump
 _syscall_table_jump
-		IMPORT _kfree
-		IMPORT _kalloc
-			
-		; not meant as final, only for heap testing
-		;; Implement by yourself
-		; check R7
-		CMP R7, #0x4
-		BEQ _kalloc ; is not branching for some reason
-		; invoke routine based on R7
+		PUSH {LR}
+		
+		LDR R0, =SYSTEMCALLTBL
+		
+		; Set R0 to addr of function based on R7
+		ADD R0, R0, R7, LSL #2
+		LDR R1, [R0]
+		
+		; branch to function addr
+		BLX R1
+		
+		POP 	{LR}
 		MOV		pc, lr			
 		
 		END

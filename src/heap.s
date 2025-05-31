@@ -40,6 +40,7 @@ _heap_init_done
 		EXPORT	_kalloc
 _kalloc
 	;; Implement by yourself
+		MOV R0, #69
 		MOV		pc, lr
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
