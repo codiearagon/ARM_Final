@@ -39,14 +39,15 @@ _syscall_table_init
 _syscall_table_jump
 		PUSH {LR}
 		
-		LDR R0, =SYSTEMCALLTBL
+		; don't use R0, R1, or R7 
+		LDR R2, =SYSTEMCALLTBL
 		
 		; Set R0 to addr of function based on R7
-		ADD R0, R0, R7, LSL #2
-		LDR R1, [R0]
+		ADD R2, R2, R7, LSL #2
+		LDR R3, [R2]
 		
 		; branch to function addr
-		BLX R1
+		BLX R3
 		
 		POP 	{LR}
 		MOV		pc, lr			

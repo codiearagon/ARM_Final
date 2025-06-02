@@ -25,12 +25,19 @@ _heap_init
 		LDR		R2, =MCB_ENT_SZ
 		LDR		R3, =MCB_TOTAL
 		MOV		R4, #0
+		
+		; store 0x4000 to mcb[0]
+		MOV		R5, #0x4000
+		STR		R5, [R0]
+		ADD		R0, R0, R2
+		
+		; begin loop at mcb[1]
 _heap_init_loop
-				CMP R0, R1
-				BEQ _heap_init_done
-				STR R4, [R0] ; init mcb addr to 0
-				ADD R0, R0, R2 ; add entry size to current addr
-				B _heap_init_loop
+		CMP 	R0, R1
+		BEQ 	_heap_init_done
+		STR 	R4, [R0] ; init mcb addr to 0
+		ADD 	R0, R0, R2 ; add entry size to current addr
+		B 		_heap_init_loop
 _heap_init_done
 		MOV		pc, lr
 		
@@ -40,7 +47,20 @@ _heap_init_done
 		EXPORT	_kalloc
 _kalloc
 	;; Implement by yourself
-		MOV R0, #69
+		PUSH 	{LR}
+		
+		; set size to minimum size if less than minimum size
+		LDR		R1, =MIN_SIZE
+		CMP		R0, R1
+		BGE		_kalloc_min_size_met
+		MOV		R0, R1
+
+_kalloc_min_size_met
+		LDR		R1, =MCB_TOP
+		LDR		R2, =MCB_BOT
+		LDR 	R3, =MCB_TOTAL
+		BL		_ralloc
+		POP 	{LR}
 		MOV		pc, lr
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,4 +71,26 @@ _kfree
 	;; Implement by yourself
 		MOV		pc, lr					; return from rfree( )
 		
+		
+_ralloc
+		; R0 contains memory size, R1 has MCB_TOP, R2 has MCB_BOT
+		PUSH {LR}
+		
+		LDR R4, [R1] 					; R3 contains mcb[0]
+		MOV R3, R3, ASR #1 				; half R3
+		SUB R2, R2, R4			; half total size and put as right half
+		
+		BL _ralloc
+		
+		
+		
+		
+		POP {LR}
+		MOV pc, lr
+		
 		END
+		
+		
+		
+		
+		

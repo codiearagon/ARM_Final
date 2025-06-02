@@ -26,17 +26,7 @@ Project File Date:  05/18/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.23', folder: 'C:\Users\joshi\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
-Rebuild target 'Target_1'
-"src/svc.s", line 54: Warning: A1581W: Added 2 bytes of padding at address 0x26
-   54 00000028   END
-0 Errors, 1 Warning
-assembling svc.s...
-"src/stdlib.s", line 41: Warning: A1609W: MOV <rd>,pc instruction does not set bit zero, so does not create a return address
-   41 0000000c    MOV  lr, pc
-"src/stdlib.s", line 59: Warning: A1609W: MOV <rd>,pc instruction does not set bit zero, so does not create a return address
-   59 0000001e    MOV  lr, pc
-0 Errors, 2 Warnings
-assembling stdlib.s...
+Build target 'Target_1'
 src/driver_keil.c(13): warning: unused parameter 'signum' [-Wunused-parameter]
    13 | void sig_handler1( int signum ) {
       |                        ^
@@ -45,12 +35,8 @@ src/driver_keil.c(17): warning: unused parameter 'signum' [-Wunused-parameter]
       |                        ^
 2 warnings generated.
 compiling driver_keil.c...
-assembling heap.s...
-assembling startup_TM4C129.s...
-assembling timer.s...
-compiling system_TM4C129.c...
 linking...
-Program Size: Code=1532 RO-data=584 RW-data=4 ZI-data=24680  
+Program Size: Code=1588 RO-data=584 RW-data=4 ZI-data=24680  
 ".\Objects\ARM_Final.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
@@ -78,9 +64,9 @@ Package Vendor: Keil
 
    * Component: Keil::Device:Startup@1.0.0
       Source file:   Device/Source/system_TM4C129.c
-      Include file:  Device/Include/TM4C129/TM4C129.h
       Source file:   Device/Source/ARM/startup_TM4C129.s
-Build Time Elapsed:  00:00:01
+      Include file:  Device/Include/TM4C129/TM4C129.h
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>
