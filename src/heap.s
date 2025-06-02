@@ -151,7 +151,9 @@ _ralloc_found_chunk
 _ralloc_done
 		POP {LR}
 		MOV pc, lr
-		
+
+_rfree
+
 		END
 		
 		
