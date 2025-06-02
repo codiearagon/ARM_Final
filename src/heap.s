@@ -114,27 +114,28 @@ _ralloc_right
 		MOV R1, R6 ; midpoint as right start point
 		BL _ralloc
 		LDMIA SP!, {R1-R6, R8-R9}
+		B _ralloc_done ; return
 
 _ralloc_split_mcb
 		LDR R10, [R6] ; load midpoint
 		AND R10, R10, #0x01
 		CMP R10, #0
 		BEQ	_ralloc_split_mcb_set
-		B 	_ralloc_done
+		B 	_ralloc_done ; return
 		
 _ralloc_split_mcb_set
 		STR	R9, [R6]
-		B	_ralloc_done
+		B	_ralloc_done ; return
 		
 _ralloc_found_chunk
 		LDR R10, [R1] ; load left address size
 		AND R10, R10, #0x01
 		CMP R10, #0
-		BNE _ralloc_done
+		BNE _ralloc_done ; return
 		
 		LDR R10, [R1]
 		CMP R10, R8 ; compare chunk size to actual entire size
-		BLT _ralloc_done
+		BLT _ralloc_done ; return
 		
 		; if passed all checks, set mcb entry lsb to 1
 		ORR	R11, R8, #0x01
