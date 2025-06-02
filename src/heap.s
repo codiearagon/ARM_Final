@@ -58,7 +58,6 @@ _kalloc
 _kalloc_min_size_met
 		LDR		R1, =MCB_TOP
 		LDR		R2, =MCB_BOT
-		LDR 	R3, =MCB_TOTAL
 		BL		_ralloc
 		POP 	{LR}
 		MOV		pc, lr
@@ -75,16 +74,80 @@ _kfree
 _ralloc
 		; R0 contains memory size, R1 has MCB_TOP, R2 has MCB_BOT
 		PUSH {LR}
+		LDR R3, =MCB_ENT_SZ
 		
-		LDR R4, [R1] 					; R3 contains mcb[0]
-		MOV R3, R3, ASR #1 				; half R3
-		SUB R2, R2, R4			; half total size and put as right half
+		; entire = right - left + entry size
+		SUB R4, R2, R1 					
+		ADD R4, R4, R3				
 		
+		; half of entire
+		MOV R5, R4, ASR #1
+		
+		; midpoint
+		ADD R6, R1, R5
+		
+		; heap_addr
+		MOV R7, #-1
+		
+		; actual entire size
+		MOV R8, R4, LSL #4
+		
+		; actual half size
+		MOV R9, R5, LSL #4
+		
+		CMP R0, R9 ; compare malloc size to half size
+		BLE _ralloc_left
+		B _ralloc_found_chunk
+		
+_ralloc_left
+		STMDB SP!, {R1-R6, R8-R9}
+		SUB R2, R6, R3 ; midpoint - mcb_ent_sz as new left end point
 		BL _ralloc
+		LDMIA SP!, {R1-R6, R8-R9}
 		
+		CMP R7, #-1
+		BEQ _ralloc_right
+		B _ralloc_split_mcb
 		
+_ralloc_right
+		STMDB SP!, {R1-R6, R8-R9}
+		MOV R1, R6 ; midpoint as right start point
+		BL _ralloc
+		LDMIA SP!, {R1-R6, R8-R9}
+
+_ralloc_split_mcb
+		LDR R10, [R6] ; load midpoint
+		AND R10, R10, #0x01
+		CMP R10, #0
+		BEQ	_ralloc_split_mcb_set
+		B 	_ralloc_done
 		
+_ralloc_split_mcb_set
+		STR	R9, [R6]
+		B	_ralloc_done
 		
+_ralloc_found_chunk
+		LDR R10, [R1] ; load left address size
+		AND R10, R10, #0x01
+		CMP R10, #0
+		BNE _ralloc_done
+		
+		LDR R10, [R1]
+		CMP R10, R8 ; compare chunk size to actual entire size
+		BLT _ralloc_done
+		
+		; if passed all checks, set mcb entry lsb to 1
+		ORR	R11, R8, #0x01
+		STR R11, [R1]
+		
+		; set heap addr
+		LDR R7, =HEAP_TOP
+		LDR R11, =MCB_TOP
+		SUB	R10, R1, R11 ; left - MCB_TOP
+		MOV R10, R10, LSL #4 ; * 16
+		ADD R7, R7, R10 ; HEAP_TOP + (left - MCB_TOP)
+		
+_ralloc_done
 		POP {LR}
 		MOV pc, lr
 		

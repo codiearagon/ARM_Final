@@ -24,8 +24,8 @@ int main( ) {
 	//_bzero( stringB, 40 );
 	_strncpy( stringB, stringA, 40 );
 	_bzero( stringA, 40 );
-	void* mem1 = _malloc( 1024 );
-	void* mem2 = _malloc( 1024 );
+	void* mem1 = _malloc( 4096 );
+	void* mem2 = _malloc( 8192 );
 	void* mem3 = _malloc( 8192 );
 	void* mem4 = _malloc( 4096 );
 	void* mem5 = _malloc( 512 );
