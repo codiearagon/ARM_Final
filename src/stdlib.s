@@ -34,15 +34,21 @@ _strncpy
 ;   	void*	a pointer to the allocated space
 		EXPORT	_malloc
 _malloc
-		; save registers
-			STMDB SP!, {LR, R0-R12}
-		; set the system call # to R7
+			; save registers
+			STMDB SP!, {LR, R0-R6, R8-R12}
+			
+			; set the system call # to R7
 			MOV		R7, #0x3
-			MOV		lr, pc
 	        SVC     #0x3
-		; resume registers
-			LDMIA SP!, {LR, R0-R12}
-		MOV		pc, lr
+			
+			; resume registers
+			LDMIA SP!, {LR, R0-R6, R8-R12}
+			
+			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
+			; SVC clears R0-R3(?), that's why I'm using R7
+			MOV R0, R7
+			
+			MOV		pc, lr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; void _free( void* addr )
@@ -52,15 +58,21 @@ _malloc
 ;   	none
 		EXPORT	_free
 _free
-		; save registers
-			STMDB SP!, {LR, R0-R12}
-		; set the system call # to R7
+			; save registers
+			STMDB SP!, {LR, R0-R6, R8-R12}
+			
+			; set the system call # to R7
 			MOV		R7, #0x4
-			MOV		lr, pc
 	        SVC     #0x4
-		; resume registers
-			LDMIA SP!, {LR, R0-R12}
-		MOV		pc, lr
+			
+			; resume registers
+			LDMIA SP!, {LR, R0-R6, R8-R12}
+			
+			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
+			; SVC clears R0-R3(?), that's why I'm using R7
+			MOV R0, R7
+			
+			MOV		pc, lr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; unsigned int _alarm( unsigned int seconds )

@@ -46,7 +46,7 @@ _heap_init_done
 ; void* _k_alloc( int size )
 		EXPORT	_kalloc
 _kalloc
-	;; Implement by yourself
+		;; Implement by yourself
 		PUSH 	{LR}
 		
 		; set size to minimum size if less than minimum size
@@ -67,9 +67,33 @@ _kalloc_min_size_met
 ; void free( void *ptr )
 		EXPORT	_kfree
 _kfree
-	;; Implement by yourself
-		MOV		pc, lr					; return from rfree( )
+		;; Implement by yourself
+		PUSH {LR}
 		
+		; check if ptr addr is within heap addr
+		LDR R1, =HEAP_TOP
+		LDR R2, =HEAP_BOT
+		CMP R0, R1
+		BLT _kfree_done 
+		CMP R0, R2
+		BGT _kfree_done
+		
+		; get mcb addr
+		; mcb_addr = mcb_top + (addr - heap_top) / 16
+		LDR R1, =MCB_TOP
+		LDR R2, =HEAP_TOP
+		SUB R3, R0, R2
+		MOV R3, R3, ASR #4
+		ADD R1, R1, R3 
+		
+		BL _rfree
+		
+_kfree_done
+		POP {LR}
+		MOV	pc, lr					; return from rfree( )
+
+
+;----ralloc-region-start----
 		
 _ralloc
 		; R0 contains memory size, R1 has MCB_TOP, R2 has MCB_BOT
@@ -150,10 +174,20 @@ _ralloc_found_chunk
 		
 _ralloc_done
 		POP {LR}
+		MOV R12, R7 ; mov heap_addr to return register
 		MOV pc, lr
 
-_rfree
+;----ralloc-region-end----
 
+;----rfree-region-start----
+
+_rfree
+		PUSH {LR}
+		LDR R1, =MCB_TOP
+		
+_rfree_done
+		POP {LR}
+		MOV pc, lr
 		END
 		
 		
