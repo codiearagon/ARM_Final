@@ -10,8 +10,18 @@
 ;   none
 		EXPORT	_bzero
 _bzero
-		; implement your complete logic, including stack operations
-		MOV		pc, lr	
+    PUSH    {R2, lr}           ; Save r2 and return address
+    CMP     R1, #0             ; If n == 0, return
+    BEQ     bzero_done
+
+bzero_loop
+    MOV     R2, #0             ; Clear byte
+    STRB    R2, [R0], #1       ; Store byte and increment r0
+    SUBS    R1, R1, #1         ; Decrement count
+    BNE     bzero_loop         ; Continue if not done
+
+bzero_done
+    POP     {R2, pc}           ; Restore r2 and return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; char* _strncpy( char* dest, char* src, int size )
@@ -23,8 +33,34 @@ _bzero
 ;   dest
 		EXPORT	_strncpy
 _strncpy
-		; implement your complete logic, including stack operations
-		MOV		pc, lr
+    PUSH    {R3-R5, lr}        ; Save used registers and return addr
+    MOV     R3, R0             ; Save dst to return later
+    CMP     R2, #0             ; If len == 0, skip loop
+    BEQ     strncpy_done
+
+strncpy_loop
+    LDRB    R4, [R1], #1       ; Load byte from src and post-increment
+    STRB    R4, [R0], #1       ; Store to dst and post-increment
+    SUBS    R2, R2, #1         ; Decrement len
+    CMP     R4, #0             ; Check if null terminator
+    BEQ     pad_nulls
+    CMP     R2, #0             ; If len == 0, exit
+    BNE     strncpy_loop
+    B       strncpy_done
+
+pad_nulls
+    ; R2 still holds how many bytes are left to pad
+pad_loop
+    CMP     R2, #0
+    BEQ     strncpy_done
+    MOV     R5, #0
+    STRB    R5, [R0], #1
+    SUBS    R2, R2, #1
+    B       pad_loop
+
+strncpy_done
+    MOV     R0, R3             ; Return original dst
+    POP     {R3-R5, pc}
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; void* _malloc( int size )
@@ -34,21 +70,15 @@ _strncpy
 ;   	void*	a pointer to the allocated space
 		EXPORT	_malloc
 _malloc
-			; save registers
-			STMDB SP!, {LR, R0-R6, R8-R12}
-			
-			; set the system call # to R7
+		; save registers
+			STMDB SP!, {LR, R0-R12}
+		; set the system call # to R7
 			MOV		R7, #0x3
+			MOV		lr, pc
 	        SVC     #0x3
-			
-			; resume registers
-			LDMIA SP!, {LR, R0-R6, R8-R12}
-			
-			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
-			; SVC clears R0-R3(?), that's why I'm using R7
-			MOV R0, R7
-			
-			MOV		pc, lr
+		; resume registers
+			LDMIA SP!, {LR, R0-R12}
+		MOV		pc, lr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; void _free( void* addr )
@@ -58,21 +88,15 @@ _malloc
 ;   	none
 		EXPORT	_free
 _free
-			; save registers
-			STMDB SP!, {LR, R0-R6, R8-R12}
-			
-			; set the system call # to R7
+		; save registers
+			STMDB SP!, {LR, R0-R12}
+		; set the system call # to R7
 			MOV		R7, #0x4
+			MOV		lr, pc
 	        SVC     #0x4
-			
-			; resume registers
-			LDMIA SP!, {LR, R0-R6, R8-R12}
-			
-			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
-			; SVC clears R0-R3(?), that's why I'm using R7
-			MOV R0, R7
-			
-			MOV		pc, lr
+		; resume registers
+			LDMIA SP!, {LR, R0-R12}
+		MOV		pc, lr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; unsigned int _alarm( unsigned int seconds )
