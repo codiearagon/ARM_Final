@@ -236,7 +236,7 @@ Reset_Handler   PROC
 				
 				; Change CPU mode into unprivileged thread mode using PSP
 				;[Hajira] Control register bit 0 = nPriv
-				;nPriv = 0(Privileged), npriv = 1(using msp)
+				;nPriv = 0(Privileged), npriv = 1(unpriv)
 				;[Hajira] Control register bit 1 = SPSEL
 				;SPSEL = 0(using psp), SPSEL = 1(using msp)
 				
@@ -282,8 +282,6 @@ SVC_Handler     PROC 		; (Step 2)
 				STMDB SP!, {LR, R0, R1, R7}
 		; Invoke _syscall_table_ump
 				BL _syscall_table_jump
-		; Save registers 
-		; Invoke _syscall_table_jump
 		; Retrieve registers
 				LDMIA SP!, {LR, R0, R1, R7}
 		; Go back to stdlib.s
@@ -301,11 +299,20 @@ PendSV_Handler\
                 ENDP
 SysTick_Handler\
                 PROC		; (Step 2)
-        	EXPORT  SysTick_Handler           [WEAK]
+				EXPORT  SysTick_Handler           [WEAK]
+				IMPORT _timer_update
 		; Save registers
+				STMDB SP!, {LR, R0, R1, R7}
 		; Invoke _timer_update
+				BL _timer_update
 		; Retrieve registers
+				LDMIA SP!, {LR, R0, R1, R7}
 		; Change from MSP to PSP
+				MRS R0,CONTROL
+				BIC R0, R0, #0x3 ;Bitwise clear
+				ORR R0,R0,#0x1
+				MSR CONTROL, R0
+				ISB
 		; Go back to the user program
                 B       .
                 ENDP
