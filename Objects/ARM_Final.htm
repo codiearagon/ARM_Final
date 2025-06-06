@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\Objects\ARM_Final.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\ARM_Final.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Wed Jun  4 22:02:45 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Thu Jun  5 19:03:08 2025
 <BR><P>
-<H3>Maximum Stack Usage =        152 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        160 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main
 <P>
@@ -15,8 +15,8 @@ Functions with no stack information
  <LI><a href="#[7d]">_heap_init</a>
  <LI><a href="#[79]">_kalloc</a>
  <LI><a href="#[7a]">_kfree</a>
- <LI><a href="#[a7]">_bzero</a>
- <LI><a href="#[a6]">_strncpy</a>
+ <LI><a href="#[a6]">_bzero</a>
+ <LI><a href="#[a7]">_strncpy</a>
  <LI><a href="#[a8]">_malloc</a>
  <LI><a href="#[a9]">_free</a>
  <LI><a href="#[ab]">_alarm</a>
@@ -419,7 +419,7 @@ Global Symbols
 <P><STRONG><a name="[cd]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[99]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 152 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -451,11 +451,11 @@ Global Symbols
 <P><STRONG><a name="[7a]"></a>_kfree</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, heap.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> svc.o(.text)
 </UL>
-<P><STRONG><a name="[a7]"></a>_bzero</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, stdlib.o(.text))
+<P><STRONG><a name="[a6]"></a>_bzero</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, stdlib.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[a6]"></a>_strncpy</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, stdlib.o(.text))
+<P><STRONG><a name="[a7]"></a>_strncpy</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, stdlib.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1462,8 +1462,8 @@ Global Symbols
 <P><STRONG><a name="[7b]"></a>SystemInit</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, system_tm4c129.o(.text.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(.text)
 </UL>
-<P><STRONG><a name="[9a]"></a>main</STRONG> (Thumb, 320 bytes, Stack size 152 bytes, driver_keil.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 152 + Unknown Stack Size
+<P><STRONG><a name="[9a]"></a>main</STRONG> (Thumb, 330 bytes, Stack size 160 bytes, driver_keil.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
 <LI>Call Chain = main
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
@@ -1471,8 +1471,8 @@ Global Symbols
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_alarm
 <LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_free
 <LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_malloc
-<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_strncpy
-<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_bzero
+<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_strncpy
+<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_bzero
 </UL>
 <BR>[Called By]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>

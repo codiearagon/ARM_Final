@@ -71,17 +71,17 @@ strncpy_done
 		EXPORT	_malloc
 _malloc
 			; save registers
-			STMDB SP!, {LR, R0-R6, R8-R12}
+			STMDB SP!, {LR, R0-R10, R12}
 			
 			; set the system call # to R7
 			MOV		R7, #0x3
 			SVC     #0x3
 			
 			; resume registers
-			LDMIA SP!, {LR, R0-R6, R8-R12}
+			LDMIA SP!, {LR, R0-R10, R12}
 			
-			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
-			MOV R0, R7
+			; MOV R11 to R0, [Codie] I'm personally using R11 as my return, but ARM uses R0 for return
+			MOV R0, R11
 			
 			MOV		pc, lr
 
@@ -94,17 +94,17 @@ _malloc
 		EXPORT	_free
 _free
 			; save registers
-			STMDB SP!, {LR, R0-R6, R8-R12}
+			STMDB SP!, {LR, R0-R10, R12}
 			
 			; set the system call # to R7
 			MOV		R7, #0x4
 			SVC     #0x4
 			
 			; resume registers
-			LDMIA SP!, {LR, R0-R6, R8-R12}
+			LDMIA SP!, {LR, R0-R10, R12}
 			
-			; MOV R7 to R0, [Codie] I'm personally using R7 as my return, but ARM uses R0 for return
-			MOV R0, R7
+			; MOV R11 to R0, [Codie] I'm personally using R11 as my return, but ARM uses R0 for return
+			MOV R0, R11
 			
 			MOV		pc, lr
 
