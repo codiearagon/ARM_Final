@@ -97,8 +97,20 @@ _timer_update_done
 ; void* signal_handler( int signum, void* handler )
 	    EXPORT	_signal_handler
 _signal_handler
-	;; Implement by yourself
-	
+		; Load previous function
+		LDR     R2, =USR_HANDLER
+		LDR     R3, [R2]
+	    ; Check if sig == SIGALRM (14)
+        CMP     R0, #SIGALRM
+        BNE     _signal_handler_done     ; If not valid, return
+
+		STR     R1, [R2] ; Load new function in handler
+
+
+_signal_handler_done
+		; Return previous handler in R0
+		MOV		R0, R3
+
 		MOV		pc, lr		; return to Reset_Handler
 		
 		END		
