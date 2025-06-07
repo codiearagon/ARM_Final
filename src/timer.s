@@ -73,7 +73,8 @@ _timer_update
 	LDR     R2, [R1] ; R2 = seconds value
 	; Decrement value by 1
 	SUB     R2, R2, #1
-
+	; Store new count 
+	STR R2, [R1]
 	; Branch to _timer_update_done if value isnt Zero
 	CMP R2, #0
 	BNE		_timer_update_done
@@ -83,11 +84,16 @@ _timer_update
         LDR     R3, =STCTRL_STOP
         STR     R3, [R4]
 
+		PUSH {lr} ; Save return address
+		
 	;Invoke user function whose address is maintained in 0x20007B84
 		LDR     R5, =USR_HANDLER   ; Address holding function pointer
-        LDR     R5, [R5]           ; Load function pointer
-        BLX     R5
+        LDR     R5, [R5]     
+        BLX     R5 ; Call function
 
+        ; Restore original return address
+        POP     {lr}
+		
 _timer_update_done
 		MOV R0, R2
 		MOV		pc, lr		; return to SysTick_Handler
