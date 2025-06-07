@@ -303,7 +303,7 @@ PendSV_Handler\
                 ENDP
 SysTick_Handler\
                 PROC		; (Step 2)
-EXPORT  SysTick_Handler           [WEAK]
+				EXPORT  SysTick_Handler			[WEAK]
                 IMPORT _timer_update
                 
                 ; Save registers
