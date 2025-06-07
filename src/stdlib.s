@@ -119,9 +119,14 @@ _free
 		EXPORT	_alarm
 _alarm
 		; save registers
+		STMDB SP!, {LR, R0-R10, R12}
+
 		; set the system call # to R7
-        	SVC     #0x0
+		MOV		R7, #0x1
+    	SVC     #0x1
 		; resume registers	
+		LDMIA SP!, {LR, R0-R10, R12}
+
 		MOV		pc, lr		
 			
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,9 +140,13 @@ _alarm
 		EXPORT	_signal
 _signal
 		; save registers
+		STMDB SP!, {LR, R0-R10, R12}
 		; set the system call # to R7
-        	SVC     #0x0
+		MOV		R7, #0x2
+        SVC     #0x2
 		; resume registers
+		LDMIA SP!, {LR, R0-R10, R12}
+
 		MOV		pc, lr	
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -303,22 +303,27 @@ PendSV_Handler\
                 ENDP
 SysTick_Handler\
                 PROC		; (Step 2)
-				EXPORT  SysTick_Handler           [WEAK]
-				IMPORT _timer_update
-		; Save registers
-				STMDB SP!, {LR, R0, R1, R7}
-		; Invoke _timer_update
-				BL _timer_update
-		; Retrieve registers
-				LDMIA SP!, {LR, R0, R1, R7}
-		; Change from MSP to PSP
-				MRS R0,CONTROL
-				BIC R0, R0, #0x3 ;Bitwise clear
-				ORR R0,R0,#0x1
-				MSR CONTROL, R0
-				ISB
-		; Go back to the user program
-                B       .
+EXPORT  SysTick_Handler           [WEAK]
+                IMPORT _timer_update
+                
+                ; Save registers
+                STMDB SP!, {LR, R0, R1, R7}
+                
+                ; Invoke _timer_update
+                BL _timer_update
+                
+                ; Retrieve registers
+                LDMIA SP!, {LR, R0, R1, R7}
+                
+                ; Change from MSP to PSP
+                MRS R0,CONTROL
+                BIC R0, R0, #0x3 ;Bitwise clear
+                ORR R0,R0,#0x1
+                MSR CONTROL, R0
+                ISB
+                
+                ; Go back to the user program
+                BX LR
                 ENDP
 
 GPIOA_Handler\

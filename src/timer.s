@@ -23,7 +23,16 @@ USR_HANDLER     EQU		0x20007B84		; Address of a user-given signal handler functi
 		EXPORT		_timer_init
 _timer_init
 	;; Implement by yourself
-	
+	;Stop SysTick
+        LDR     R0, =STCTRL         ; SysTick Control Register
+        LDR     R1, =STCTRL_STOP    ; Bit 2 (CLK_SRC) = 1, Bit 1 (INT_EN) = 0, Bit 0 (ENABLE) = 0
+        STR     R1, [R0]
+
+	; Load maximum value to SYST_RVR (Reload Register)
+		LDR     R0, =STRELOAD
+		LDR		R1, =STRELOAD_MX 	
+		STR     R1, [R0]
+
 		MOV		pc, lr		; return to Reset_Handler
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,7 +41,26 @@ _timer_init
 		EXPORT		_timer_start
 _timer_start
 	;; Implement by yourself
-	
+		;(1) Retrieve the seconds parameter from memory address 0x20007B80
+		LDR     R1, =SECOND_LEFT
+		LDR     R2, [R1] ; R2 = previous seconds value
+
+		;(2) Save a new seconds parameter from alarm( ) to memory address 0x20007B80.
+		STR R0, [R1] ; R0 = int seconds put into R1
+
+		;(3) Enable SysTick: Set SYST_CSR’s Bit 2 (CLK_SRC) = 1, Bit 1 (INT_EN) = 1, Bit 0 (ENABLE) = 1
+		LDR     R4, =STCTRL  
+    	LDR     R3, =STCTRL_GO  
+    	STR     R3, [R4]
+
+		;(4) Clear SYST_CVR: Set 0x00000000 in SYST_CVR
+		LDR 	R4, =STCURRENT
+		LDR 	R3, =STCURR_CLR
+		STR 	R3, [R4]
+
+		; Return previous time value to main( ) through R0
+		MOV R0, R2
+
 		MOV		pc, lr		; return to SVC_Handler
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -40,8 +68,28 @@ _timer_start
 ; void timer_update( )
 		EXPORT		_timer_update
 _timer_update
-	;; Implement by yourself
-	
+	; Read the value at address 0x20007B80
+	LDR     R1, =SECOND_LEFT
+	LDR     R2, [R1] ; R2 = seconds value
+	; Decrement value by 1
+	SUB     R2, R2, #1
+
+	; Branch to _timer_update_done if value isnt Zero
+	CMP R2, #0
+	BNE		_timer_update_done
+
+	; Stop Timer
+        LDR     R4, =STCTRL
+        LDR     R3, =STCTRL_STOP
+        STR     R3, [R4]
+
+	;Invoke user function whose address is maintained in 0x20007B84
+		LDR     R5, =USR_HANDLER   ; Address holding function pointer
+        LDR     R5, [R5]           ; Load function pointer
+        BLX     R5
+
+_timer_update_done
+		MOV R0, R2
 		MOV		pc, lr		; return to SysTick_Handler
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
